@@ -28,9 +28,9 @@ class Video(BaseModel):
 
     async def save(self):
         if self.data:
-            printf("保存文件" + self.filename)
+            print("保存文件" + self.filename)
         else:
-            printf("保存文件失败" + self.filename)
+            print("保存文件失败" + self.filename)
 
 
 class VideoProcessingService(video_pb2_grpc.VideoProcessingServiceServicer):
