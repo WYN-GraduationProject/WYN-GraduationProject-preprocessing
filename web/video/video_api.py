@@ -1,18 +1,43 @@
 import uuid
 
-from utils.tools.FPSCalculator import FPSCalculator
-from video.Model import VideoModel
-from fastapi import APIRouter
+import cv2
+from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 
 from proto.video_service.video_model_pb2 import VideoFrame
+from utils.tools.gRPCManager import GrpcManager
+from video.Model import VideoModel
 
-import cv2
+router = APIRouter(
+    prefix="/video",
+    tags=["video"],
+    responses={404: {"description": "Not found"}},
+)
 
-router = APIRouter()
-cap = cv2.VideoCapture(0)  # 尝试使用0作为摄像头索引
-if not cap.isOpened():
-    print("Error: Could not open video device.")
-    exit(1)
+
+def get_grpc_manager():
+    return GrpcManager()
+
+
+@router.get("/test")
+async def test(grpc_manager: GrpcManager = Depends(get_grpc_manager)):
+    video_path = "video/test/video_data/test.mp4"
+    cap = cv2.VideoCapture(video_path)
+    video_id = str(uuid.uuid4())
+    video_filename = f"{video_id}.mp4"
+    video_save_path = f"video_data/{video_id}"
+    video = VideoModel(video_save_path, video_filename, video_id, [], 60)
+    while True:
+        res, frame = cap.read()
+        if not res:
+            break
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        async with grpc_manager.get_stub('video_pre_service') as stub:
+            async for res in stub.ProcessVideo(request_generator(frame)):
+                video.data.append(res.data)
+    await video.save()
+    return FileResponse(video_path, media_type="video/mp4")
+
 
 def request_generator(frame):
     ret, buffer = cv2.imencode('.jpg', frame)
@@ -20,29 +45,3 @@ def request_generator(frame):
         print("Failed to encode frame")
         return None
     yield VideoFrame(data=buffer.tobytes())
-
-@router.get("/")
-async def open_camera(stub):
-    fps_calculator = FPSCalculator()
-    video_id = str(uuid.uuid4())
-    video_path = f"video_data/{video_id}"
-    video_filename = f"{video_id}.mp4"
-    video = VideoModel(video_path, video_filename, video_id, [], 30)
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Failed to capture frame")
-            continue
-
-        fps = await fps_calculator.update()
-
-        # 将FPS信息添加到帧上
-        cv2.putText(frame, f'FPS: {fps:.2f}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        # 显示原始帧
-        cv2.imshow('Original Frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # 如果按下'q'则退出
-            break
-        async for res in stub.ProcessVideo(request_generator(frame)):
-            video.fps = fps
-            video.data.append(res.data)
-    await video.save()

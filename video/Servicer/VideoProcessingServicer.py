@@ -1,6 +1,7 @@
 import cv2
 import grpc
 import numpy as np
+import logging as log
 
 from proto.video_service.video_model_pb2 import ProcessedVideoFrame
 from proto.video_service.video_service_pb2_grpc import VideoServiceServicer
@@ -16,7 +17,7 @@ class VideoProcessingServicer(VideoServiceServicer):
         try:
             async for request in request_iterator:
                 np_arr = np.frombuffer(request.data, np.uint8)
-                print("接收到来自客户端的数据：", np_arr.size, "bytes:", np_arr[:10], "...")
+                log.info("接收到来自客户端的数据：{} bytes: {}...".format(np_arr.size, np_arr[:10]))
                 if np_arr.size == 0:
                     context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Empty frame data.")
                 # 将numpy数组转换为OpenCV图像
@@ -34,4 +35,4 @@ class VideoProcessingServicer(VideoServiceServicer):
                 yield ProcessedVideoFrame(data=img_encoded.tobytes())
         except Exception as e:
             context.abort(grpc.StatusCode.UNKNOWN, str(e))
-            print(e)
+            log.error("处理视频流时发生错误：{}".format(e))

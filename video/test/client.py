@@ -6,11 +6,11 @@ import cv2
 import grpc.aio
 
 from proto.video_service.video_model_pb2 import VideoFrame
-from proto.video_service.video_service_pb2_grpc import VideoServiceStub
+from utils.tools.gRPCManager import GrpcManager
 from utils.tools.FPSCalculator import FPSCalculator
 from video.Model import VideoModel
 
-cap = cv2.VideoCapture(0)  # 尝试使用0作为摄像头索引
+cap = cv2.VideoCapture(1)  # 尝试使用0作为摄像头索引
 
 if not cap.isOpened():
     print("Error: Could not open video device.")
@@ -52,9 +52,9 @@ async def display_frames(stub):
 
 
 async def run():
-    channel = grpc.aio.insecure_channel('localhost:50051')
-    stub = VideoServiceStub(channel)
-    await display_frames(stub)
+    grpc_manager = GrpcManager()
+    async with grpc_manager.get_stub('video_pre_service') as stub:
+        await display_frames(stub)
 
 
 logging.basicConfig(level=logging.INFO)
