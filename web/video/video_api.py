@@ -1,21 +1,18 @@
-import asyncio
-import logging
 import uuid
 
-import cv2
-import grpc.aio
-
-from proto.video_service.video_model_pb2 import VideoFrame
-from proto.video_service.video_service_pb2_grpc import VideoServiceStub
 from utils.tools.FPSCalculator import FPSCalculator
 from video.Model import VideoModel
+from fastapi import APIRouter
 
+from proto.video_service.video_model_pb2 import VideoFrame
+
+import cv2
+
+router = APIRouter()
 cap = cv2.VideoCapture(0)  # 尝试使用0作为摄像头索引
-
 if not cap.isOpened():
     print("Error: Could not open video device.")
     exit(1)
-
 
 def request_generator(frame):
     ret, buffer = cv2.imencode('.jpg', frame)
@@ -24,8 +21,8 @@ def request_generator(frame):
         return None
     yield VideoFrame(data=buffer.tobytes())
 
-
-async def display_frames(stub):
+@router.get("/")
+async def open_camera(stub):
     fps_calculator = FPSCalculator()
     video_id = str(uuid.uuid4())
     video_path = f"video_data/{video_id}"
@@ -49,17 +46,3 @@ async def display_frames(stub):
             video.fps = fps
             video.data.append(res.data)
     await video.save()
-
-
-async def run():
-    channel = grpc.aio.insecure_channel('localhost:50051')
-    stub = VideoServiceStub(channel)
-    await display_frames(stub)
-
-
-logging.basicConfig(level=logging.INFO)
-
-if __name__ == '__main__':
-    asyncio.run(run())
-    cap.release()
-    cv2.destroyAllWindows()

@@ -3,20 +3,14 @@ from typing import Tuple
 
 from grpc.aio import insecure_channel
 
-from .ConfigHandler import _CONFIG_HANDLER, ConfigHandler
-from .Singleton import Singleton
+from .Singleton import Singleton, singleton
 
-__all__ = ['gRPCManager', 'MockGRPCManager']
-
-from ..service import ServiceEnum
+__all__ = ['GrpcManager', 'MockGRPCManager']
 
 
-class gRPCManager(metaclass=Singleton):
-    def __init__(self, handler: ConfigHandler = _CONFIG_HANDLER):
-        all_options = handler.get_options('ServiceSetting')
-
-        service_hosts = list(filter(lambda x: x.endswith('_service_host'), all_options))
-        service_ports = list(filter(lambda x: x.endswith('_service_port'), all_options))
+@singleton
+class GrpcManager:
+    def __init__(self):
         self._service_host = {}
         self._service_ports = {}
 
