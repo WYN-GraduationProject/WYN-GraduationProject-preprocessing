@@ -1,13 +1,39 @@
-from fastapi import Depends, FastAPI
-from web.video import video_api
-from utils.tools.NacosManager import NacosManager
+import asyncio
+import logging
 
 import uvicorn
+from fastapi import FastAPI
+
+from utils.tools.LoggingFormatter import ColorFormatter, LoggerManager
+from utils.tools.NacosManager import NacosManager, NacosServerUtils
+from web.video import video_api
 
 app = FastAPI()
 
 app.include_router(video_api.router)
 
+logger = LoggerManager(logger_name="server").get_logger()
+
+nacos_serverutils: NacosServerUtils = None  # 定义变量以便在事件处理器中引用
+
+
+@app.on_event("startup")
+async def startup_event():
+    global nacos_serverutils
+    nacos_serverutils = NacosManager().get_server_utils("video_pre_service", "localhost", 8000)
+    # 注册服务
+    await nacos_serverutils.register_service()  # 确保这是异步的，或者使用适当的同步调用
+    # 启动心跳发送任务，假设 beat 是异步方法
+    asyncio.create_task(nacos_serverutils.beat(10))
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # 取消注册服务
+    nacos_serverutils.deregister_service()
+    pass
+
+
 if __name__ == "__main__":
-    NacosManager().get_server_utils("video_pre_service", "localhost", 8000).register_service()
+    logger.info("服务启动...")
     uvicorn.run(app, host="localhost", port=8000)

@@ -1,3 +1,6 @@
+import asyncio
+import logging
+
 import nacos
 
 from utils.tools.Singleton import singleton
@@ -11,20 +14,26 @@ class NacosServerUtils:
     Nacos服务注册工具类
     """
 
-    def __init__(self, client, service_name, ip, port):
-        self.client = client
-        self.service_name = service_name
-        self.ip = ip
-        self.port = port
+    def __init__(self, _client, _service_name, _ip, _port):
+        self.client = _client
+        self.service_name = _service_name
+        self.ip = _ip
+        self.port = _port
 
-    def register_service(self):
+    async def register_service(self):
         return self.client.add_naming_instance(self.service_name, self.ip, self.port)
 
     def deregister_service(self):
-        return self.client.deregister_service(self.service_name, self.ip, self.port)
+        return self.client.remove_naming_instance(self.service_name, self.ip, self.port)
 
-    def beat(self):
-        return self.client.send_heartbeat(self.service_name, self.ip, self.port)
+    async def beat(self, interval=30):
+        while True:
+            try:
+                self.client.send_heartbeat(self.service_name, self.ip, self.port)
+                logging.debug("心跳发送成功")
+            except Exception as e:
+                logging.error(f"发送心跳失败: {e}")
+            await asyncio.sleep(interval)
 
 
 class NacosConfigUtils:

@@ -1,9 +1,11 @@
 import logging
 import os
 from typing import List, Optional
-
+from utils.tools.LoggingFormatter import LoggerManager
 import cv2 as cv
 import numpy as np
+
+logger = LoggerManager(logger_name="VideoModel").get_logger()
 
 
 class VideoModel:
@@ -42,7 +44,7 @@ class VideoModel:
         :return: None
         """
         if not self.data:
-            logging.log(logging.ERROR, f"保存文件失败：{self.filename}，没有数据")
+            logger.error(f"视频保存失败：{self.filename}，没有数据")
             return
         os.makedirs(self.path, exist_ok=True)
         filepath = os.path.join(self.path, self.filename)
@@ -61,7 +63,7 @@ class VideoModel:
                 out.write(frame)
 
         out.release()
-        logging.log(logging.INFO, f"视频保存成功：{filepath}")
+        logger.info(f"视频保存成功：{self.filename}")
 
     async def to_gray(self):
         """
@@ -69,7 +71,7 @@ class VideoModel:
         :return: None
         """
         if not self.data:
-            logging.log(logging.ERROR, f"转换为灰度视频失败：{self.filename}，没有数据")
+            logger.error(f"视频转换为灰度视频失败：{self.filename}，没有数据")
             return
         gray_data = []
         for frame_bytes in self.data:
@@ -80,5 +82,4 @@ class VideoModel:
                 _, img_encoded = cv.imencode('.jpg', gray_frame)
                 gray_data.append(img_encoded.tobytes())
         self.data = gray_data
-        logging.log(logging.INFO, f"视频转换为灰度视频成功：{self.filename}")
-
+        logger.info(f"视频转换为灰度视频成功：{self.filename}")
