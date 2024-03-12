@@ -63,23 +63,6 @@ class VideoModel:
                 out.write(frame)
 
         out.release()
-        logger.info(f"视频保存成功：{self.filename}")
+        logger.info(f"视频保存成功：{self.path}/{self.filename}")
 
-    async def to_gray(self):
-        """
-        将视频转换为灰度视频
-        :return: None
-        """
-        if not self.data:
-            logger.error(f"视频转换为灰度视频失败：{self.filename}，没有数据")
-            return
-        gray_data = []
-        for frame_bytes in self.data:
-            frame = np.frombuffer(frame_bytes, dtype=np.uint8)
-            frame = cv.imdecode(frame, cv.IMREAD_COLOR)
-            if frame is not None:
-                gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                _, img_encoded = cv.imencode('.jpg', gray_frame)
-                gray_data.append(img_encoded.tobytes())
-        self.data = gray_data
-        logger.info(f"视频转换为灰度视频成功：{self.filename}")
+

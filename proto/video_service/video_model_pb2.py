@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%proto/video_service/video_model.proto\x12\rvideo_service\",\n\nVideoFrame\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\x10\n\x08is_final\x18\x02 \x01(\x08\"5\n\x13ProcessedVideoFrame\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\x10\n\x08is_final\x18\x02 \x01(\x08\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n%proto/video_service/video_model.proto\x12\rvideo_service\"9\n\nVideoFrame\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\x10\n\x08is_final\x18\x02 \x01(\x08\x12\x0b\n\x03\x66ps\x18\x03 \x01(\x02\"5\n\x13ProcessedVideoFrame\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\x10\n\x08is_final\x18\x02 \x01(\x08\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,7 +22,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _globals['_VIDEOFRAME']._serialized_start=56
-  _globals['_VIDEOFRAME']._serialized_end=100
-  _globals['_PROCESSEDVIDEOFRAME']._serialized_start=102
-  _globals['_PROCESSEDVIDEOFRAME']._serialized_end=155
+  _globals['_VIDEOFRAME']._serialized_end=113
+  _globals['_PROCESSEDVIDEOFRAME']._serialized_start=115
+  _globals['_PROCESSEDVIDEOFRAME']._serialized_end=168
 # @@protoc_insertion_point(module_scope)
