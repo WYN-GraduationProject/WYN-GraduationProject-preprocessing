@@ -64,5 +64,3 @@ class VideoModel:
 
         out.release()
         logger.info(f"视频保存成功：{self.path}/{self.filename}")
-
-

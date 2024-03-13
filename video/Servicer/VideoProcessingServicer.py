@@ -49,7 +49,7 @@ class VideoProcessingServicer(VideoServiceServicer):
                     logger.info("接收到来自客户端的结束帧...")
 
                     # 尽量不要在 rpc 服务中进行文件保存操作，因为这样会阻塞服务
-                    # await video.save()
+                    await video.save()
                     break
 
                 np_arr = np.frombuffer(request.data, np.uint8)
@@ -64,10 +64,9 @@ class VideoProcessingServicer(VideoServiceServicer):
                     logger.error("Cannot decode frame data.")
                     context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Cannot decode frame data.")
 
-                # 将图像数据添加到视频实体中
-                video.data.append(request.data)
                 # 将 request.data 进行处理，转换为灰度图
                 gray_frame = await to_gray(request.data)
+                video.data.append(gray_frame)
                 # 返回处理后的图像数据
                 yield ProcessedVideoFrame(data=gray_frame, is_final=False)
         except Exception as e:
