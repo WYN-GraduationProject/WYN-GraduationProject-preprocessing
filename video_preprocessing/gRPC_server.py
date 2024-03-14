@@ -1,16 +1,19 @@
 import asyncio
 import logging
+
 import grpc
-import logging
 
 from concurrent import futures
-from Servicer.VideoProcessingServicer import VideoProcessingServicer
+from servicer.VideoProcessingServicer import VideoProcessingServicer
 from proto.video_service.video_service_pb2_grpc import add_VideoServiceServicer_to_server
-from utils.tools.LoggingFormatter import ColorFormatter, LoggerManager
+from utils.tools.LoggingFormatter import LoggerManager
 from utils.tools.gRPCManager import GrpcManager
 from utils.tools.NacosManager import NacosManager
 
 logger = LoggerManager(logger_name="gRPC").get_logger()
+# 获取nacos.client模块的日志器，并设置其日志级别为WARNING
+nacos_logger = logging.getLogger('nacos.client')
+nacos_logger.setLevel(logging.WARNING)
 
 
 async def serve():

@@ -3,7 +3,6 @@ import logging
 import uuid
 
 import cv2
-import grpc.aio
 
 from proto.video_service.video_model_pb2 import VideoFrame
 from utils.tools.gRPCManager import GrpcManager
@@ -13,7 +12,7 @@ from video.Model import VideoModel
 cap = cv2.VideoCapture(1)  # 尝试使用0作为摄像头索引
 
 if not cap.isOpened():
-    print("Error: Could not open video device.")
+    print("Error: Could not open video_preprocessing device.")
     exit(1)
 
 

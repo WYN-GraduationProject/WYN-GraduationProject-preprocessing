@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import List, Optional
 from utils.tools.LoggingFormatter import LoggerManager

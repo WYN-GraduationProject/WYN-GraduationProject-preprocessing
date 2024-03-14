@@ -93,5 +93,4 @@ async def upload_video(video: UploadFile = File(...), grpc_manager: GrpcManager 
     video_path = await save_video(video)
     response = StreamingResponse(process_video(video_path, grpc_manager),
                                  media_type="multipart/x-mixed-replace; boundary=frame")
-
     return response

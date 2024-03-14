@@ -8,7 +8,7 @@ from typing import Optional
 from proto.video_service.video_service_pb2_grpc import VideoServiceServicer
 from proto.video_service.video_model_pb2 import ProcessedVideoFrame
 from utils.tools.LoggingFormatter import LoggerManager
-from video.Model import VideoModel
+from video_preprocessing.model.video import VideoModel
 
 logger = LoggerManager(logger_name="VideoProcessingServicer").get_logger()
 
