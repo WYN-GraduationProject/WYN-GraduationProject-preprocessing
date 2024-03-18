@@ -1,5 +1,3 @@
-import uuid
-
 import cv2
 import grpc
 import numpy as np
@@ -8,7 +6,7 @@ from typing import Optional
 from proto.video_service.video_service_pb2_grpc import VideoServiceServicer
 from proto.video_service.video_model_pb2 import ProcessedVideoFrame
 from utils.tools.LoggingFormatter import LoggerManager
-from video_preprocessing.model.video import VideoModel
+from utils.model.video import VideoModel
 
 logger = LoggerManager(logger_name="VideoProcessingServicer").get_logger()
 
@@ -49,8 +47,6 @@ class VideoProcessingServicer(VideoServiceServicer):
                     video.fps = request.fps
                     logger.info("该视频{}的视频帧率为：{}".format(video.id, video.fps))
                     logger.info("接收到来自客户端的结束帧...")
-
-                    # 尽量不要在 rpc 服务中进行文件保存操作，因为这样会阻塞服务
                     await video.save()
                     break
 
