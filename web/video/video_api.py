@@ -7,12 +7,13 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import FileResponse
 from typing import Tuple
 
+from starlette.background import BackgroundTask
 from proto.video_service.video_model_pb2 import VideoFrame
 from utils.tools.LoggingFormatter import LoggerManager
 from utils.tools.gRPCManager import GrpcManager
 
 router = APIRouter(
-    prefix="/video",
+    prefix="/api/video-pre",
     tags=["video"],
     responses={404: {"description": "Not found"}},
 )
@@ -92,6 +93,7 @@ async def save_video(video: UploadFile) -> Tuple[str, str]:
 async def upload_video(video: UploadFile = File(...), grpc_manager: GrpcManager = Depends(get_grpc_manager)):
     # 传递视频文件路径给处理函数
     video_path, video_id = await save_video(video)
-    response = FileResponse(await process_video(video_path, video_id, grpc_manager),
-                            media_type="video/mp4")
+    file_name = await process_video(video_path, video_id, grpc_manager)
+    response = FileResponse(file_name, media_type="video/mp4", filename="video.mp4",
+                            background=BackgroundTask(lambda: os.remove(file_name)))
     return response

@@ -31,7 +31,7 @@ nacos_serverutils: NacosServerUtils = None  # 定义变量以便在事件处理�
 @app.on_event("startup")
 async def startup_event():
     global nacos_serverutils
-    nacos_serverutils = NacosManager().get_server_utils("video_pre_service", "localhost", 8000)
+    nacos_serverutils = NacosManager().get_server_utils("video-pre-service", "localhost", 8000)
     # 注册服务
     await nacos_serverutils.register_service()
     # 启动心跳发送任务
