@@ -21,7 +21,7 @@ async def serve():
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
     add_VideoServiceServicer_to_server(VideoProcessingServicer(), server)
     server.add_insecure_port('[::]:' + str(port))
-    nacos_serverutils = NacosManager().get_server_utils("video-pre-service-gRPC", "localhost", port)
+    nacos_serverutils = NacosManager().get_server_utils("video-pre-service-gRPC", "0.0.0.0", port)
     # 注册服务
     await nacos_serverutils.register_service()
     # 启动心跳发送任务
