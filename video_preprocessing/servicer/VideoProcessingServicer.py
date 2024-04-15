@@ -1,5 +1,3 @@
-import uuid
-
 import cv2
 import grpc
 import numpy as np
@@ -8,7 +6,7 @@ from typing import Optional
 from proto.video_service.video_service_pb2_grpc import VideoServiceServicer
 from proto.video_service.video_model_pb2 import ProcessedVideoFrame
 from utils.tools.LoggingFormatter import LoggerManager
-from video.Model import VideoModel
+from utils.model.video import VideoModel
 
 logger = LoggerManager(logger_name="VideoProcessingServicer").get_logger()
 
@@ -37,18 +35,16 @@ class VideoProcessingServicer(VideoServiceServicer):
         :param request_iterator: 流式请求迭代器
         :param context: rpc请求上下文
         """
-        video_id = str(uuid.uuid4())
-        video_filename = f"{video_id}.mp4"
-        video_save_path = f"video_data/{video_id}"
-        video = VideoModel(video_save_path, video_filename, video_id, [], 30)
+        video = VideoModel("", "", "", [], 30)
         try:
             async for request in request_iterator:
+                video.id = request.video_id
+                video.filename = f"{video.id}.mp4"
+                video.path = "video_data/preprocessing"
                 if request.is_final:
                     video.fps = request.fps
-                    logger.info("该视频{}的视频帧率为：{}".format(video_id, video.fps))
+                    logger.info("该视频{}的视频帧率为：{}".format(video.id, video.fps))
                     logger.info("接收到来自客户端的结束帧...")
-
-                    # 尽量不要在 rpc 服务中进行文件保存操作，因为这样会阻塞服务
                     await video.save()
                     break
 
@@ -68,7 +64,7 @@ class VideoProcessingServicer(VideoServiceServicer):
                 gray_frame = await to_gray(request.data)
                 video.data.append(gray_frame)
                 # 返回处理后的图像数据
-                yield ProcessedVideoFrame(data=gray_frame, is_final=False)
+                yield ProcessedVideoFrame(data=gray_frame, video_path=video.path + "/" + video.filename)
         except Exception as e:
             context.abort(grpc.StatusCode.UNKNOWN, str(e))
             logger.error("处理视频流时发生错误：{}".format(e))
