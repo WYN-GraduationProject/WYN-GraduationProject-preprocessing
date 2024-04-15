@@ -40,9 +40,7 @@ class VideoProcessingServicer(VideoServiceServicer):
             async for request in request_iterator:
                 video.id = request.video_id
                 video.filename = f"{video.id}.mp4"
-                video.path = (
-                    f"/Users/wangyaning/毕业设计/源代码/backend/WYN-GraduationProject-preprocessing/video_data"
-                    f"/preprocessing")
+                video.path = "video_data/preprocessing"
                 if request.is_final:
                     video.fps = request.fps
                     logger.info("该视频{}的视频帧率为：{}".format(video.id, video.fps))
