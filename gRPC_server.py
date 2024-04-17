@@ -4,7 +4,7 @@ import logging
 import grpc
 
 from concurrent import futures
-from video_preprocessing.servicer.VideoProcessingServicer import VideoProcessingServicer
+from infrastructure_layer.servicer.VideoProcessingServicer import VideoProcessingServicer
 from proto.video_service.video_service_pb2_grpc import add_VideoServiceServicer_to_server
 from utils.tools.LoggingFormatter import LoggerManager
 from utils.tools.gRPCManager import GrpcManager
