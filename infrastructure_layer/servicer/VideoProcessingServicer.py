@@ -45,7 +45,6 @@ class VideoProcessingServicer(VideoServiceServicer):
                     video.fps = request.fps
                     logger.info("该视频{}的视频帧率为：{}".format(video.id, video.fps))
                     logger.info("接收到来自客户端的结束帧...")
-                    await video.save()
                     break
 
                 np_arr = np.frombuffer(request.data, np.uint8)
