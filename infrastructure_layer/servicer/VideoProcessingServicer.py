@@ -51,14 +51,14 @@ class VideoProcessingServicer(VideoServiceServicer):
                 np_arr = np.frombuffer(request.data, np.uint8)
 
                 if np_arr.size == 0:
-                    logger.error("Empty frame data.")
-                    context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Empty frame data.")
+                    logger.error("没有图像数据.")
+                    context.abort(grpc.StatusCode.INVALID_ARGUMENT, "没有图像数据.")
 
                 # 将numpy数组转换为OpenCV图像
                 img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
                 if img is None or img.size == 0:
-                    logger.error("Cannot decode frame data.")
-                    context.abort(grpc.StatusCode.INVALID_ARGUMENT, "Cannot decode frame data.")
+                    logger.error("无法解码帧数据.")
+                    context.abort(grpc.StatusCode.INVALID_ARGUMENT, "无法解码帧数据.")
 
                 # 将 request.data 进行处理，转换为灰度图
                 gray_frame = await to_gray(request.data)
